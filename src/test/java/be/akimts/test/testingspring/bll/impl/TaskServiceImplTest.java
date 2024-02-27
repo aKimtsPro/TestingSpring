@@ -2,8 +2,10 @@ package be.akimts.test.testingspring.bll.impl;
 
 import be.akimts.test.testingspring.bll.TaskService;
 import be.akimts.test.testingspring.bll.exceptions.ResourceNotFoundException;
+import be.akimts.test.testingspring.bll.exceptions.TitleAlreadyTakenException;
 import be.akimts.test.testingspring.dal.TaskRepository;
 import be.akimts.test.testingspring.domain.entities.Task;
+import be.akimts.test.testingspring.domain.entities.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,7 +30,26 @@ class TaskServiceImplTest {
 
     @Test
     void create() {
+        Task toCreate = new Task();
+        toCreate.setTitle("titre");
+        toCreate.setDescription("description");
+        toCreate.setStatus(TaskStatus.TODO);
 
+        when( mockRepo.save(toCreate) ).thenReturn(toCreate);
+
+        Task rslt = taskService.create(toCreate);
+        assertEquals(toCreate, rslt);
+        verify( mockRepo, times(1)).save(toCreate);
+    }
+
+    @Test
+    void create_titleTaken() {
+        Task task = new Task();
+        task.setTitle("taken");
+
+        when( mockRepo.existsByTitle("taken") ).thenReturn(true);
+        assertThrows(TitleAlreadyTakenException.class, () -> this.taskService.create(task));
+        verify( mockRepo, times(1) ).existsByTitle("taken");
     }
 
     @Test
@@ -61,6 +82,21 @@ class TaskServiceImplTest {
 
     @Test
     void delete() {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("title");
+        task.setDescription("desc");
+        task.setStatus(TaskStatus.TODO);
+
+        when( mockRepo.findById(1L) ).thenReturn(Optional.of(task));
+        taskService.delete(1L);
+        verify(mockRepo, times(1)).delete(task);
+    }
+
+    @Test
+    void delete_notFound(){
+        when( mockRepo.findById(1L) ).thenReturn(Optional.empty());
+        assertThrows( ResourceNotFoundException.class, () -> taskService.delete(1L) );
     }
 
     @Test

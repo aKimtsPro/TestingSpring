@@ -22,7 +22,6 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(@RequestBody TaskForm task) {
-        System.out.println(task.toEntity());
         Task createdTask = taskService.create(task.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body( TaskDTO.mapToDTO(createdTask) );
