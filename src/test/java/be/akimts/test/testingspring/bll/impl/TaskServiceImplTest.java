@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class TaskServiceImplTest {
 
@@ -20,7 +21,8 @@ class TaskServiceImplTest {
 
     @BeforeEach
     void initTest(){
-        this.mockRepo = Mockito.mock(TaskRepository.class);
+        this.mockRepo = mock(TaskRepository.class);
+//        this.mockRepo = Mockito.mock(TaskRepository.class); // pareil que ceci grace à l'import static.
         this.taskService = new TaskServiceImpl(this.mockRepo);
     }
 
@@ -32,21 +34,21 @@ class TaskServiceImplTest {
     @Test
     void getOne() {
         Task task = new Task();
-        Mockito.when( mockRepo.findById(1L) )
+        when( mockRepo.findById(1L) )
                 .thenReturn( Optional.of(task) );
 
         Task result = this.taskService.getOne(1L);
         assertEquals(task, result);
-        Mockito.verify( mockRepo ).findById(1L);
+        verify( mockRepo ).findById(1L);
     }
 
     @Test
     void getOne_notFound(){
-        Mockito.when( mockRepo.findById(1L) )
+        when( mockRepo.findById(1L) )
                 .thenReturn( Optional.empty() );
 
         assertThrows( ResourceNotFoundException.class, () -> this.taskService.getOne(1L) );
-        Mockito.verify( mockRepo, Mockito.times(2)).findById(1L);
+        verify( mockRepo, times(2)).findById(1L);
     }
 
     @Test
