@@ -39,4 +39,14 @@ public class TaskIntegrationTests {
                 .andExpect( MockMvcResultMatchers.jsonPath("$.status").value(TaskStatus.TODO.toString()) );
     }
 
+    @Test
+    void getOne(){
+
+    }
+
+    @Test
+    void getOne_notFound(){
+
+    }
+
 }
